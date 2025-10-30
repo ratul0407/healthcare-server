@@ -15,4 +15,14 @@ router.post(
   }
 );
 
+router.post(
+  "/create-doctor",
+  fileUploader.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = UserValidation.createDoctorValidationSchema.parse(
+      JSON.parse(req.body.data)
+    );
+    return userController.createDoctor;
+  }
+);
 export const UserRoutes = router;
