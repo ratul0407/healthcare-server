@@ -8,6 +8,15 @@ const createPatientValidationSchema = z.object({
   }),
 });
 
+const createAdminValidationSchema = z.object({
+  password: z.string(),
+  admin: z.object({
+    name: z.string(),
+    email: z.string(),
+    contactNumber: z.string(),
+  }),
+});
+
 const createDoctorValidationSchema = z.object({
   password: z.string(),
   doctor: z.object({
@@ -28,4 +37,5 @@ const createDoctorValidationSchema = z.object({
 export const UserValidation = {
   createPatientValidationSchema,
   createDoctorValidationSchema,
+  createAdminValidationSchema,
 };

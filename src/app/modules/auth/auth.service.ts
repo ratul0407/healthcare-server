@@ -20,13 +20,13 @@ const login = async (payload: { email: string; password: string }) => {
   }
 
   const accessToken = jwtHelpers.generateToken(
-    { email: user.email, role: user.email },
+    { email: user.email, role: user.role },
     "jsonwebtoken",
     "1h"
   );
 
   const refreshToken = jwtHelpers.generateToken(
-    { email: user.email, role: user.email },
+    { email: user.email, role: user.role },
     "jsonwebtoken",
     "90d"
   );

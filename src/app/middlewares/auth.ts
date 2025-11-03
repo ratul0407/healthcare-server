@@ -13,8 +13,11 @@ const auth = (...roles: string[]) => {
         throw new Error("You are not authorized");
       }
       const verifyUser = jwtHelpers.verifyToken(token, "jsonwebtoken");
+
       req.user = verifyUser;
+      console.log(verifyUser);
       if (roles.length && !roles.includes(verifyUser.role)) {
+        console.log(verifyUser.role, roles);
         throw new Error("You are not authorized");
       }
       next();
