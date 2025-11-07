@@ -3,6 +3,7 @@ import catchAsync from "../../shared/catchAsync";
 import { ScheduleService } from "./schedule.service";
 import sendResponse from "../../shared/sendResponse";
 import pick from "../../helper/pick";
+import { IJwtPayload } from "../../types/common";
 
 const insertToDB = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -17,10 +18,19 @@ const insertToDB = catchAsync(
 );
 
 const schedulesForDoctor = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (
+    req: Request & { user?: IJwtPayload },
+    res: Response,
+    next: NextFunction
+  ) => {
     const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
     const filters = pick(req.query, ["startDateTime", "endDateTime"]);
-    const result = await ScheduleService.schedulesForDoctor(filters, options);
+    const user = req.user;
+    const result = await ScheduleService.schedulesForDoctor(
+      user as IJwtPayload,
+      filters,
+      options
+    );
     sendResponse(res, {
       success: true,
       statusCode: 200,
