@@ -8,7 +8,7 @@ const globalErrorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  let statusCode = httpStatus.INTERNAL_SERVER_ERROR;
+  let statusCode : number = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
   let success = false;
   let message = err.message || "Something went wrong!";
   let error = err;
@@ -21,10 +21,17 @@ const globalErrorHandler = (
     if (err.code === "P1000") {
       message = "Authentication failed against database server";
       error = err.meta;
+      statusCode = httpStatus.BAD_REQUEST;
     }
     if (err.code === "P2003") {
       message = "Foreign key constraint failed";
       error = err.meta;
+      statusCode = httpStatus.BAD_REQUEST;
+    }
+    if (err.code === "P2025") {
+      message = "Record not found";
+      error = err.meta;
+      statusCode = httpStatus.BAD_REQUEST;
     }
   } else if (err instanceof Prisma.PrismaClientValidationError) {
     message = "Validation Error";
