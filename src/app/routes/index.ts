@@ -30,7 +30,7 @@ const moduleRoutes = [
     route: SpecialtiesRoutes,
   },
   {
-    path: "/doctors",
+    path: "/doctor",
     route: DoctorRoutes,
   },
 ];
