@@ -3,7 +3,10 @@ import calculatePagination, { TOptions } from "../../helper/paginationHelper";
 import { doctorSearchableFields } from "./doctor.constants";
 import { prisma } from "../../shared/prisma";
 import { IDoctorUpdateInput } from "./doctor.interface";
-
+import httpStatus from "http-status";
+import ApiError from "../../errors/apiError";
+import { openai } from "../../helper/openRouter";
+import { extractJsonFromMessage } from "../../helper/extractJsonFromMsgs";
 const getAllFromDB = async (filters: any, options: TOptions) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
   const { searchTerm, specialties, ...filterData } = filters;
@@ -113,8 +116,46 @@ const updateIntoDB = async (
   });
 };
 
-const suggestion = async (payload: { symptom: string }) => {
-  console.log(payload);
+const suggestion = async (payload: { symptoms: string }) => {
+  console.log(payload, payload.symptoms, payload.symptoms.length);
+  if (!payload || !payload.symptoms || payload.symptoms.length <= 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "symptoms are required!");
+  }
+  const doctors = await prisma.doctor.findMany({
+    where: {
+      isDeleted: false,
+    },
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialities: true,
+        },
+      },
+    },
+  });
+  const prompt = `You are a medical assistant AI. based on patients symptoms, suggest top 3 most suitable doctors. Each doctor has specialties and years of experience. Only suggest doctors who are relevant to the symptoms. 
+  
+  Symptoms: ${payload.symptoms}
+  Here is the doctors list in JSON format: ${JSON.stringify(doctors, null, 2)}
+  Return yours response in JSON format with full individual doctor data. 
+  `;
+  const completion = await openai.chat.completions.create({
+    model: "z-ai/glm-4.5-air:free",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a medical assistant AI that provides doctors suggestions.",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+  });
+
+  const result = await extractJsonFromMessage(completion.choices[0].message);
+  return result;
 };
 export const DoctorService = {
   getAllFromDB,
