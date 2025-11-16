@@ -19,7 +19,7 @@ enum AppointmentStatus {
     SCHEDULED
     INPROGRESS
     COMPLETED
-    CANCELLED
+    CANCEL
 }
 
 enum PaymentStatus {
