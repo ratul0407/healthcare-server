@@ -26,7 +26,7 @@ const getAllFromDB = async (filters: any, options: TOptions) => {
     andConditions.push({
       doctorSpecialties: {
         some: {
-          specialities: {
+          specialties: {
             title: {
               contains: specialties,
               mode: "insensitive",
@@ -55,7 +55,7 @@ const getAllFromDB = async (filters: any, options: TOptions) => {
     include: {
       doctorSpecialties: {
         include: {
-          specialities: true,
+          specialties: true,
         },
       },
     },
@@ -88,7 +88,7 @@ const updateIntoDB = async (
 
       for (const specialtyId of deleteSpecialtiesIds) {
         await tnx.doctorSpecialties.deleteMany({
-          where: { doctorId: id, specialitiesId: specialtyId.specialtyId },
+          where: { doctorId: id, specialtiesId: specialtyId.specialtyId },
         });
       }
 
@@ -96,7 +96,7 @@ const updateIntoDB = async (
         await tnx.doctorSpecialties.create({
           data: {
             doctorId: id,
-            specialitiesId: specialtyId.specialtyId,
+            specialtiesId: specialtyId.specialtyId,
           },
         });
       }
@@ -107,7 +107,7 @@ const updateIntoDB = async (
       include: {
         doctorSpecialties: {
           include: {
-            specialities: true,
+            specialties: true,
           },
         },
       },
@@ -128,7 +128,7 @@ const suggestion = async (payload: { symptoms: string }) => {
     include: {
       doctorSpecialties: {
         include: {
-          specialities: true,
+          specialties: true,
         },
       },
     },
@@ -157,8 +157,27 @@ const suggestion = async (payload: { symptoms: string }) => {
   const result = await extractJsonFromMessage(completion.choices[0].message);
   return result;
 };
+const getById = async (id: string) => {
+  const doctor = await prisma.doctor.findUnique({
+    where: { id, isDeleted: false },
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialties: true,
+        },
+      },
+      doctorSchedules: {
+        include: {
+          schedule: true,
+        },
+      },
+    },
+  });
+  return doctor;
+};
 export const DoctorService = {
   getAllFromDB,
   updateIntoDB,
   suggestion,
+  getById,
 };
