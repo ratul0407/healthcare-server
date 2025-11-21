@@ -6,7 +6,11 @@ dotenv.config({ path: path.join(process.cwd(), ".env") });
 export default {
   node_env: process.env.NODE_ENV,
   port: process.env.PORT,
-  database_url: process.env.DATABASE_URL,
+  daabase_url: process.env.DATABASE_URL,
+  access_secret: process.env.ACCESS_SECRET,
+  refresh_secret: process.env.REFRESH_SECRET,
+  access_expires: process.env.ACCESS_EXPIRES,
+  refresh_expires: process.env.REFRESH_EXPIRES,
   cloudinary: {
     api_secret: process.env.CLOUDINARY_API_SECRET,
     api_key: process.env.CLOUDINARY_API_KEY,

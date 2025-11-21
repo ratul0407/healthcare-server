@@ -3,12 +3,15 @@ import catchAsync from "../../shared/catchAsync";
 import sendResponse from "../../shared/sendResponse";
 import { PrescriptionService } from "./prescription.service";
 import { IJwtPayload } from "../../types/common";
+import pick from "../../helper/pick";
 
 const createPrescription = catchAsync(
   async (req: Request & { user?: IJwtPayload }, res: Response) => {
     const user = req.user;
-    const result = await PrescriptionService.createPrescription;
-    user as IJwtPayload, req.body();
+    const result = await PrescriptionService.createPrescription(
+      user as IJwtPayload,
+      req.body
+    );
     sendResponse(res, {
       success: true,
       statusCode: 201,
@@ -18,6 +21,24 @@ const createPrescription = catchAsync(
   }
 );
 
+const myPrescriptions = catchAsync(
+  async (req: Request & { user?: IJwtPayload }, res: Response) => {
+    const user = req.user;
+    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
+    const result = await PrescriptionService.myPrescriptions(
+      user as IJwtPayload,
+      options
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: 201,
+      message: "Prescription created successfully!",
+      data: result.data,
+      meta: result.meta,
+    });
+  }
+);
 export const PrescriptionController = {
   createPrescription,
+  myPrescriptions,
 };

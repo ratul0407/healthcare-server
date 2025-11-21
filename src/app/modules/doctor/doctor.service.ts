@@ -58,6 +58,11 @@ const getAllFromDB = async (filters: any, options: TOptions) => {
           specialties: true,
         },
       },
+      reviews: {
+        select: {
+          rating: true,
+        },
+      },
     },
   });
 
@@ -171,6 +176,7 @@ const getById = async (id: string) => {
           schedule: true,
         },
       },
+      reviews: true,
     },
   });
   return doctor;

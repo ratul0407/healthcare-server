@@ -26,3 +26,18 @@ enum PaymentStatus {
     PAID 
     UNPAID
 }
+enum BloodGroup {
+    A_Postive
+    A_Negative
+    B_Positive
+    B_Negative
+    AB_Positive
+    AB_Negative
+    O_Positive    
+    O_Negative
+    
+}
+enum MartialStatus {
+    MARRIED
+    UNMARRIED
+}

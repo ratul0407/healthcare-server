@@ -4,6 +4,8 @@ import httpStatus from "http-status";
 import bcrypt from "bcryptjs";
 import { jwtHelpers } from "../../helper/jwtHelper";
 import ApiError from "../../errors/apiError";
+import config from "../../../config";
+import { Secret } from "jsonwebtoken";
 const login = async (payload: { email: string; password: string }) => {
   const user = await prisma.user.findUniqueOrThrow({
     where: {
@@ -22,14 +24,14 @@ const login = async (payload: { email: string; password: string }) => {
 
   const accessToken = jwtHelpers.generateToken(
     { email: user.email, role: user.role },
-    "jsonwebtoken",
-    "1h"
+    config.access_secret as Secret,
+    config.access_expires as string
   );
 
   const refreshToken = jwtHelpers.generateToken(
     { email: user.email, role: user.role },
-    "jsonwebtoken",
-    "90d"
+    config.refresh_secret as Secret,
+    config.refresh_expires as string
   );
 
   return {
@@ -39,6 +41,23 @@ const login = async (payload: { email: string; password: string }) => {
   };
 };
 
+const getMe = async (session: any) => {
+  const accessToken = session.accessToken;
+  const decoded = jwtHelpers.verifyToken(
+    accessToken,
+    config.access_secret as Secret
+  );
+
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: decoded.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+  const { id, email, role, needPasswordChange, status } = userData;
+  return { id, email, role, needPasswordChange, status };
+};
 export const AuthService = {
   login,
+  getMe,
 };

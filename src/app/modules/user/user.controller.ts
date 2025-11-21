@@ -4,6 +4,7 @@ import { userService } from "./user.service";
 import sendResponse from "../../shared/sendResponse";
 import pick from "../../helper/pick";
 import { userFilterableFields } from "./user.constant";
+import { IJwtPayload } from "../../types/common";
 
 const createPatient = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.createPatient(req);
@@ -46,9 +47,36 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     data: result.data,
   });
 });
+const getMe = catchAsync(
+  async (req: Request & { user?: IJwtPayload }, res: Response) => {
+    const user = req.user;
+    const result = await userService.getProfile(user as IJwtPayload);
+    sendResponse(res, {
+      statusCode: 201,
+      success: true,
+      message: "Doctor created successfully!",
+      data: result,
+    });
+  }
+);
+const changeProfileStatus = catchAsync(
+  async (req: Request & { user?: IJwtPayload }, res: Response) => {
+    const user = req.user;
+    const { id } = req.params;
+    const result = await userService.changeProfileStatus(id, req.body);
+    sendResponse(res, {
+      statusCode: 201,
+      success: true,
+      message: "Doctor created successfully!",
+      data: result,
+    });
+  }
+);
 export const userController = {
   createPatient,
   createDoctor,
   createAdmin,
   getAllFromDB,
+  getMe,
+  changeProfileStatus,
 };
