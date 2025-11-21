@@ -4,6 +4,7 @@ import { IJwtPayload } from "../../types/common";
 import sendResponse from "../../shared/sendResponse";
 import { JwtPayload } from "jsonwebtoken";
 import { AppointmentService } from "./appointment.service";
+import pick from "../../helper/pick";
 
 const createAppointment = catchAsync(
   async (req: Request & { user?: IJwtPayload }, res: Response) => {
@@ -20,6 +21,26 @@ const createAppointment = catchAsync(
     });
   }
 );
+
+const getMyAppointments = catchAsync(
+  async (req: Request & { user?: IJwtPayload }, res: Response) => {
+    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
+    const filters = pick(req.query, ["status", "paymentStatus"]);
+    const user = req.user;
+    const result = await AppointmentService.getMyAppointments(
+      user as IJwtPayload,
+      filters,
+      options
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: "Appointments retrieved successfully!",
+      data: result,
+    });
+  }
+);
 export const AppointemntController = {
   createAppointment,
+  getMyAppointments,
 };
