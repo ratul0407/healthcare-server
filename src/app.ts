@@ -6,6 +6,8 @@ import config from "./config";
 import router from "./app/routes";
 import cookieParser from "cookie-parser";
 import { PaymentController } from "./app/modules/payment/payment.controller";
+import cron from "node-cron";
+import { AppointmentService } from "./app/modules/appointment/appointment.service";
 const app: Application = express();
 app.post(
   "/webhook",
@@ -23,6 +25,13 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+cron.schedule("* * * * *", async () => {
+  try {
+    AppointmentService.cancelUnpaidAppointments();
+  } catch (error) {
+    console.log(error);
+  }
+});
 app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
