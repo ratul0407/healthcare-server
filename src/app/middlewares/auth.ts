@@ -7,7 +7,7 @@ const auth = (...roles: string[]) => {
   return async (
     req: Request & { user?: any },
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const token = req.cookies.accessToken;
@@ -16,7 +16,7 @@ const auth = (...roles: string[]) => {
       }
       const verifyUser = jwtHelpers.verifyToken(
         token,
-        config.access_secret as Secret
+        config.access_secret as Secret,
       );
 
       req.user = verifyUser;
